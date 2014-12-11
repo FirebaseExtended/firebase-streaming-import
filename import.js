@@ -1,9 +1,9 @@
 var oboe = require('oboe');
 var fs = require('fs');
 var Firebase = require("firebase");
+var optimist = require('optimist');
 
-
-var argv = require('optimist')
+var argv = optimist
   .usage('Usage: $0')
   .demand('firebase_url')
   .describe('firebase_url', 'Firebase URL (e.g. https://test.firebaseio.com/dest/path).')
