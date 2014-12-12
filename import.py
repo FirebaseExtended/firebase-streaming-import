@@ -3,6 +3,7 @@ import requests
 import argparse
 import json
 import sys
+import traceback
 
 
 def main(args):
@@ -20,14 +21,18 @@ def main(args):
             newURL += '.json?print=silent'
 
             if event == 'number':
-                dataObj = {lastPrefix: int(value)}
+                dataObj = {lastPrefix: float(value)}
             else:
                 dataObj = {lastPrefix: value}
-            if args.auth is not None:
-                authObj = {'auth': args.auth}
-                requests.patch(newURL, data=json.dumps(dataObj), params=authObj)
-            else:
-                requests.patch(newURL, data=json.dumps(dataObj))
+            try:
+                if args.auth is not None:
+                    authObj = {'auth': args.auth}
+                    requests.patch(newURL, data=json.dumps(dataObj), params=authObj)
+                else:
+                    requests.patch(newURL, data=json.dumps(dataObj))
+            except Exception, e:
+                print('Caught an error: ' + traceback.format_exc())
+                print prefix, event, value
 
             sys.stdout.write('.')
             sys.stdout.flush()
