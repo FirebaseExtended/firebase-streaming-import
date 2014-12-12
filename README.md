@@ -3,6 +3,8 @@ Firebase Streaming Import
 
 Utilizes ijson python json streaming library along with requests to import a large json piecemeal into Firebase.
 
+Repeats efforts already done in [firebase-import](https://github.com/firebase/firebase-import), however firebase-import doesn't handle large json files well.  Node runs out of memory.  This script streams in data so there are no limits, however it might not be as fast or efficient as the other one.
+
 Requirements: 
 - root of tree should be empty, since we make REST PATCH calls
 - run `pip install -r requirements.txt`
