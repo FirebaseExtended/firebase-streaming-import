@@ -1,15 +1,23 @@
-Firebase Streaming Importer
+Firebase Streaming Import
 ===========================
 
-Utilizes Oboe JSON streaming library combined with the Firebase JS Client to import large JSON files to an online Firebase.  
+Utilizes ijson python json streaming library along with requests to import a large json piecemeal into Firebase.
 
 Requirements: 
 - root of tree should be empty, since we make firebaseRef.update() calls
-- security rules should allow write access (you can turn this off after the import completes)
-- run npm install
+- run `pip install -r requirements.txt`
 
-Usage: node ./import.js
+```
+usage: import.py [-h] [-a AUTH] firebase_url json_file
 
-Options:
-  --firebase_url  Firebase URL (e.g. https://test.firebaseio.com/dest/path).  [required]
-  --json          The JSON file to import.                                    [required]
+Import a large json file into a Firebase via json Streaming.
+
+positional arguments:
+  firebase_url          Specify the Firebase URL (e.g.
+                        https://test.firebaseio.com/dest/path).
+  json_file             The JSON file to import.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a AUTH, --auth AUTH  Optional Auth token if necessary to write to Firebase.
+```
