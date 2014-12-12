@@ -4,7 +4,7 @@ Firebase Streaming Import
 Utilizes ijson python json streaming library along with requests to import a large json piecemeal into Firebase.
 
 Requirements: 
-- root of tree should be empty, since we make firebaseRef.update() calls
+- root of tree should be empty, since we make REST PATCH calls
 - run `pip install -r requirements.txt`
 
 ```
