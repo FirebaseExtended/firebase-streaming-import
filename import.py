@@ -3,39 +3,46 @@ import requests
 import argparse
 import json
 import sys
-import traceback
 
 
 def main(args):
 
     parser = ijson.parse(open(args.json_file))
+
+    rootObj = {}
     for prefix, event, value in parser:
         if value is not None and event != 'map_key':
 
-            prefixes = prefix.split('.')
-            newURL = args.firebase_url
-            lastPrefix = prefixes[-1]
-            prefixes = prefixes[:-1]
-            for prefix in prefixes:
-                newURL += prefix + '/'
-            newURL += '.json?print=silent'
-
             if event == 'number':
-                dataObj = {lastPrefix: float(value)}
+                leafValue = float(value)
             else:
-                dataObj = {lastPrefix: value}
-            try:
-                if args.auth is not None:
-                    authObj = {'auth': args.auth}
-                    requests.patch(newURL, data=json.dumps(dataObj), params=authObj)
-                else:
-                    requests.patch(newURL, data=json.dumps(dataObj))
-            except Exception, e:
-                print('Caught an error: ' + traceback.format_exc())
-                print prefix, event, value
+                leafValue = value
 
-            sys.stdout.write('.')
-            sys.stdout.flush()
+            prefixes = prefix.split('.')
+
+            currObj = rootObj
+            for prefix in prefixes[:-1]:
+                if prefix in currObj:
+                    currObj = currObj[prefix]
+                else:
+                    newObj = {}
+                    currObj[prefix] = newObj
+                    currObj = newObj
+            currObj[prefixes[-1]] = leafValue
+
+    patchToFirebase(rootObj, args)
+
+
+def patchToFirebase(dataObj, args):
+    restURL = args.firebase_url + '.json?print=silent'
+    if args.auth is not None:
+        authObj = {'auth': args.auth}
+        requests.patch(restURL, data=json.dumps(dataObj), params=authObj)
+    else:
+        requests.patch(restURL, data=json.dumps(dataObj))
+    sys.stdout.write('.')
+    sys.stdout.flush()
+
 
 if __name__ == '__main__':
     argParser = argparse.ArgumentParser(description="Import a large json file into a Firebase via json Streaming.")
