@@ -90,6 +90,6 @@ if __name__ == '__main__':
     argParser.add_argument('json_file', help="The JSON file to import.")
     argParser.add_argument('-a', '--auth', help="Optional Auth token if necessary to write to Firebase.")
     argParser.add_argument('-s', '--silent', action='store_true', help="Silences the server response, speeding up the connection.")
-    argParser.add_argument('-c', '--chunk_size', default=10, type=int, help="Chunk size in Megabytes, defaults to 10MB.")
+    argParser.add_argument('-c', '--chunk_size', default=1, type=int, help="Chunk size in Megabytes, defaults to 1MB.")
     args = argParser.parse_args()
     main(args)
