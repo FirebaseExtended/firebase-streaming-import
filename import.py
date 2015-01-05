@@ -38,17 +38,20 @@ def main(args):
             if args.silent:
                 url += '?print=silent'
 
+            if not args.priority_mode:
+                if lastPrefix == '.priority':
+                    continue
+            else:
+                if lastPrefix != '.priority':
+                    continue
+
             if event == 'number':
                 dataObj = {lastPrefix: float(value)}
             else:
                 dataObj = {lastPrefix: value}
 
             try:
-                if args.auth is not None:
-                    authObj = {'auth': args.auth}
-                    session.patch(url, data=json.dumps(dataObj), params=authObj)
-                else:
-                    session.patch(url, data=json.dumps(dataObj))
+                sendData(url, dataObj, session, args)
             except Exception, e:
                 print('Caught an error: ' + traceback.format_exc())
                 print prefix, event, value
@@ -57,11 +60,21 @@ def main(args):
             sys.stdout.flush()
 
 
+def sendData(url, dataObject, session, args):
+    if args.auth is not None:
+        authObj = {'auth': args.auth}
+        session.patch(url, data=json.dumps(dataObject), params=authObj)
+    else:
+        session.patch(url, data=json.dumps(dataObject))
+
+
 if __name__ == '__main__':
-    argParser = argparse.ArgumentParser(description="Import a large json file into a Firebase via json Streaming.  Uses HTTP PATCH requests.")
+    argParser = argparse.ArgumentParser(description="Import a large json file into a Firebase via json Streaming.  Uses HTTP PATCH requests.  Two-pass script, run once normally, then again in --priority-mode.")
     argParser.add_argument('firebase_url', help="Specify the Firebase URL (e.g. https://test.firebaseio.com/dest/path/).")
     argParser.add_argument('json_file', help="The JSON file to import.")
     argParser.add_argument('-a', '--auth', help="Optional Auth token if necessary to write to Firebase.")
     argParser.add_argument('-s', '--silent', action='store_true', help="Silences the server response, speeding up the connection.")
+    argParser.add_argument('-p', '--priority_mode', action='store_true',
+                           help='Run this script in priority mode after running it in normal mode to write all priority values.')
     args = argParser.parse_args()
     main(args)
