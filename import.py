@@ -6,13 +6,16 @@ import sys
 import re
 import traceback
 import pp
+import time
 
 
 def main(args):
+    print("started at {0}".format(time.time()))
 
     parser = ijson.parse(open(args.json_file))
     session = requests.Session()
     parallelJobs = pp.Server()
+    parallelJobs.set_ncpus(args.threads)
 
     for prefix, event, value in parser:
         if value is not None and event != 'map_key':
@@ -58,8 +61,9 @@ def main(args):
                 print('Caught an error: ' + traceback.format_exc())
                 print prefix, event, value
 
-            sys.stdout.write('.')
-            sys.stdout.flush()
+    # If we don't wait for all jobs to finish, the script will end and kill all still open threads
+    parallelJobs.wait()
+    print("finished at {0}".format(time.time()))
 
 
 def sendData(url, dataObject, session, args):
@@ -77,6 +81,7 @@ if __name__ == '__main__':
     argParser.add_argument('firebase_url', help="Specify the Firebase URL (e.g. https://test.firebaseio.com/dest/path/).")
     argParser.add_argument('json_file', help="The JSON file to import.")
     argParser.add_argument('-a', '--auth', help="Optional Auth token if necessary to write to Firebase.")
+    argParser.add_argument('-t', '--threads', type=int, default=8, help='Number of parallel threads to use, default 8.')
     argParser.add_argument('-s', '--silent', action='store_true',
                            help="Silences the server response, speeding up the connection.")
     argParser.add_argument('-p', '--priority_mode', action='store_true',
