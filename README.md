@@ -15,7 +15,7 @@ Requirements:
 usage: import.py [-h] [-a AUTH] [-s] [-p] firebase_url json_file
 
 Import a large json file into a Firebase via json Streaming. Uses HTTP PATCH
-requests. Two-pass script, run once normally, then again in --priority-mode.
+requests. Two-pass script, run once normally, then again in --priority_mode.
 
 positional arguments:
   firebase_url          Specify the Firebase URL (e.g.
